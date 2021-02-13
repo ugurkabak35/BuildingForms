@@ -1,5 +1,6 @@
 ﻿using BuildingForms.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,27 +13,35 @@ namespace BuildingForms.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            return View(ProductRepository.Products);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.Categories = new SelectList(new List<string>() { "Telefon","Tablet","Laptop"});
+
             return View();
         }
 
         [HttpPost]
-        public IActionResult Create(string Name, string Description, decimal Price, bool isApproved)
+        public IActionResult Create(Product model)
         {
-            //Gelen bilgilerle kayı işlemi
-            return View();
+            //Gelen bilgilerle kayıt işlemi
+            //Validation
+            ProductRepository.AddProduct(model);
+            return RedirectToAction("Index");
         }
 
+        //Home/Search?q=word
         [HttpGet]
         public IActionResult Search(string q)
         {
+            if (string.IsNullOrWhiteSpace(q))
+                return View();
+
             // gelen q değeri ile arama işlemi yapıldı
-            return View();
+            return View("Index",ProductRepository.Products.Where(i=>i.Name.Contains(q)));
         }
     }
 }
